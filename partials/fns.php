@@ -90,7 +90,9 @@ function getColumnJoinValueByLimit(
 	
 	$rows = array();
 	
-	$result = mysqli_query($conn, $select) or die(mysqli_error($conn).'Cannot fetch data!');
+	$result = mysqli_query ($conn, $select);
+	
+	//$result = mysqli_query($conn, $select) or die(mysqli_error($conn).'Cannot fetch data!');
 	
 	while($row = mysqli_fetch_row($result))
 	{
@@ -166,60 +168,42 @@ function findTotalAmount($qty, $unitprice, $tax)
 }
 
 
+/*------------------------------- function returns tabulated view of item being ordered */
 
-// Sms functions start here
-
-function PostRequest($url, $_data) 
+function composeOrderTable($conn, $id_string)
 {
-	//sms processor
-	 
-    // convert variables array to string:
-    $data = array();    
-    while(list($n,$v) = each($_data)){
-        $data[] = "$n=$v";
-    }    
-    $data = implode('&', $data);
-    // format --> test1=a&test2=b etc.
- 
-    // parse the given URL
-    $url = parse_url($url);
-    if ($url['scheme'] != 'http') { 
-        die('Only HTTP request are supported !');
-    }
- 
-    // extract host and path:
-    $host = $url['host'];
-    $path = $url['path'];
- 
-    // open a socket connection on port 80
-    $fp = fsockopen($host, 80);
- 
-    // send the request headers:
-    fputs($fp, "POST $path HTTP/1.1\r\n");
-    fputs($fp, "Host: $host\r\n");
-    fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
-    fputs($fp, "Content-length: ". strlen($data) ."\r\n");
-    fputs($fp, "Connection: close\r\n\r\n");
-    fputs($fp, $data);
- 
-    $result = ''; 
-    while(!feof($fp)) {
-        // receive the results of the request
-        $result .= fgets($fp, 128);
-    }
- 
-    // close the socket connection:
-    fclose($fp);
- 
-    // split the result header from the content
-    $result = explode("\r\n\r\n", $result, 2);
- 
-    $header = isset($result[0]) ? $result[0] : '';
-    $content = isset($result[1]) ? $result[1] : '';
- 
-    // return as array:
-    return array($header, $content);
+	//given the $concartid
+	$cartid = $id_string;
 	
+	//explode
+	$ctid = array_map('trim', explode(',', $cartid));
+
+	//define table header
+	$tbl = "<table class=\"comp_table\"><thead><tr><th>Item Name</th><th>Price</th><th>Quantity</th><th>Vat</th><th>Total</th></tr></thead><tbody>";
+	
+	//define total
+	$totals=0;
+	
+	//for each find 'item_name', 'price', 'quantity', 'vat', 'total'
+	foreach($ctid as $vid)
+	{
+		if($vid>0)
+		{
+			$ct_itnm = getColumnJoinValue($conn, 'item_name', 'cart', 'items', 'item_id', 'cart_id', $vid);
+			$ct_price = getColumnValue($conn, 'price', 'cart', 'cart_id', $vid);
+			$ct_qty = getColumnValue($conn, 'quantity', 'cart', 'cart_id', $vid);
+			$ct_vat = getColumnValue($conn, 'vat', 'cart', 'cart_id', $vid);
+			$ct_tot = $ct_price*$ct_qty+$ct_vat;
+		
+		
+			//define trows
+			$tbl .= "<tr><td>$ct_itnm</td><td>$ct_price</td><td>$ct_qty</td><td>$ct_vat</td><td>$ct_tot</td></tr>";
+			$totals += $ct_tot;
+		}
+	}
+	//define table footer
+	$tbl .= "</tbody><tfoot><tr><td colspan=\"4\">Total</td><td>&#8358; $totals</td></tr></tfoot></table>";
+	
+	return $tbl;
 }
 
-?>

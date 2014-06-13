@@ -73,8 +73,7 @@
 	$oid_arr = getColumnValueByLimit($conn, 'order_id', 'orders', 'customer_id', $cus,0 , 30, 'order_id','DESC');
 	$totalprice_arr = getColumnValueByLimit($conn, 'total_price', 'orders', 'customer_id', $cus,0 , 30, 'order_id','DESC');
 	$date_arr = getColumnValueByLimit($conn, 'date', 'orders', 'customer_id', $cus,0 , 30, 'order_id','DESC');
-	//$invoice_arr = getColumnValueByLimit($conn, 'invoice_no', 'orders', 'customer_id', $cus,0 , 30, 'order_id','DESC');
-	$invoice_arr = getColumnJoinValueByLimit($conn, 'invoice_id', 'orders', 'invoice', 'order_id', 'customer_id', $cus, 0 , 30, 'orders.order_id', 'DESC');
+	$invoice_arr = getColumnValueByLimit($conn, 'invoice_no', 'orders', 'customer_id', $cus,0 , 30, 'order_id','DESC');
 	
 		
 	foreach($oid_arr as $index => $oid)
@@ -85,7 +84,12 @@
 		$o_invoice = $invoice_arr[$index];
 		
 		$out1 = 	"<div class=\"hist_hd\">";
-		$out1 .= "	<span class=\"order_no\">Order#: ".$o_no."</span> &nbsp; &nbsp; || &nbsp; &nbsp; <span class=\"order_tot\">Total: N".$o_total."</span> &nbsp; &nbsp; || &nbsp; &nbsp; <span class=\"order_date\">Date: ".$o_date."</span>&nbsp; &nbsp; || &nbsp; &nbsp; <span>Invoice #".$o_invoice."</span>&nbsp; &nbsp;<span id=\"lnk".$o_no."\" class=\"viewlnk\"><a href=\"#\" onclick=\"showHide(this.id,'div".$o_no."', 'prnt".$o_no."')\">Show/Hide details</a></span> <a id=\"prnt".$o_no."\" class=\"inv_prnt_lnk\" href=\"javascript:void()\" title=\"Click to print invoice no ".$o_no."\" onclick=\"doPrint('div$o_no', '$o_no', '$o_total', '$o_date', '$o_invoice')\">Print this invoice</a> 
+		$out1 .= "	<span class=\"order_no\">Order#: ".$o_no."</span> &nbsp; &nbsp; || &nbsp; &nbsp; <span class=\"order_tot\">Total: N".$o_total."</span>
+		 &nbsp; &nbsp; || &nbsp; &nbsp; <span class=\"order_date\">Date: ".$o_date."</span>&nbsp; &nbsp; || &nbsp; &nbsp; <span>
+		 Invoice #".$o_invoice."</span>&nbsp; &nbsp;<span id=\"lnk".$o_no."\" class=\"viewlnk\">
+		 <a href=\"#\" onclick=\"showHide(this.id,'div".$o_no."', 'prnt".$o_no."')\">Show/Hide details</a></span> 
+		 <a id=\"prnt".$o_no."\" class=\"inv_prnt_lnk\" href=\"javascript:void()\" title=\"Click to print invoice no ".$o_no."\" onclick=\"doPrint('div$o_no', '$o_no', '$o_total', '$o_date', '$o_invoice')\">Print this invoice</a> 
+					
 					<div style=\"clear: both;\"></div>
 					</div>";
 		$out1 .= "<div id=\"div".$o_no."\" class=\"details_div\">";

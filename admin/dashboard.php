@@ -96,6 +96,7 @@
 
  // Make the query:
 $q = "SELECT * FROM orders 
+	JOIN invoice ON invoice.order_id=orders.order_id 
 	JOIN customers ON customers.customer_id=orders.customer_id 
 	LIMIT 10";
 
@@ -133,7 +134,7 @@ echo $val = $row2[0];
 //echo $sum['total'];
 	?></td>
 	
-<td> <a href="view_invoice.php?invoice=<?php echo $row['invoice_no'];?>"><?php echo $row['invoice_no']; ?> </td>
+<td> <a href="view_invoice.php?invoice=<?php echo $row['invoice_id'];?>"><?php echo $row['invoice_id']; ?> </td>
 	
 <td> <input type="submit" class="btn btn-danger btn-sm" id="butt<?php echo $order; ?>" 
 	value="Show Details" onclick="show_details('div<?php echo $order; ?>', 'butt<?php echo $order; ?>')" /> </td>
@@ -154,7 +155,7 @@ echo $val = $row2[0];
  	
  	<?php
 		 // Make the query:
-$q4 = "SELECT * FROM order_details
+$q4 = "SELECT *, order_details.quantity AS qty FROM order_details
 	JOIN items ON items.item_id=order_details.item_id
 	WHERE order_details.order_id = '$order'";
 
@@ -174,7 +175,7 @@ $r4 = mysqli_query ($conn, $q4) or trigger_error("Query: $q4\n<br />MySQL Error:
 			<tbody>
 				<tr> 
 				<td> <?php echo $row4['item_name']; ?> </td>
-				<td> <?php echo $row4['quantity']; ?> </td>
+				<td> <?php echo $row4['qty']; ?> </td>
 				<td> <?php echo $row4['price']; ?> </td>
 				<td> <?php echo $row4['amount']; ?> </td>
 			</tr>
